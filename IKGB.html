@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IKGB MASTER SYSTEM - DHAMEESTIRAN</title>
+    <style>
+        :root { --admin: #0f2027; --user: #2c3e50; --danger: #c0392b; --success: #27ae60; --gold: #f1c40f; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+        .main-nav { background: var(--admin); padding: 15px; text-align: center; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; margin-top: 10px; cursor: pointer; font-weight: bold; color: white; }
+        .section { display: none; } .active { display: block; }
+        .admin-tabs { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 15px; padding: 5px; }
+        .tab-link { padding: 8px 15px; background: #ddd; border-radius: 20px; font-size: 11px; border: none; cursor: pointer; white-space: nowrap; }
+        .tab-link.active-tab { background: var(--admin); color: white; }
+        .list-item { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; border-left: 5px solid var(--admin); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .flex-btn { display: flex; gap: 5px; margin-top: 8px; }
+        .small-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; color: white; font-size: 10px; font-weight: bold; }
+        .history-item { display: flex; justify-content: space-between; font-size: 11px; padding: 8px 0; border-bottom: 1px dashed #eee; }
+        .search-area { background: #eef2f3; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #d1d9e6; }
+    </style>
+</head>
+<body>
+
+    <div class="main-nav">
+        <span>IKGB ULTIMATE CONTROL</span>
+        <button onclick="switchMode()" style="background:none; border:1px solid white; color:white; border-radius:5px; padding:5px 10px; font-size:10px; cursor:pointer;">Bedel Mode</button>
+    </div>
+
+    <div class="container">
+        <div id="userSection" class="section active">
+            <div class="card" id="userLoginForm">
+                <h3 style="margin-top:0;">Login Xubinta</h3>
+                <input type="text" id="userIDInput" placeholder="ID-gaaga">
+                <input type="password" id="userPinInput" placeholder="PIN-kaaga">
+                <button class="btn" style="background:var(--user)" onclick="userLogin()">Gali Account-ka</button>
+            </div>
+            <div id="userProfileView" class="card" style="display:none;">
+                <div style="display:flex; justify-content:space-between;">
+                    <h2 id="uProfileName" style="margin:0;">Magaca</h2>
+                    <button onclick="logoutUser()" style="color:red; background:none; border:none; font-weight:bold; cursor:pointer;">Ka Bax</button>
+                </div>
+                <div id="uProfileBalances" style="margin:15px 0;"></div>
+                <div class="search-area">
+                    <small><b>Raadi Taariikh (Tusaale: Feb ama 2026):</b></small>
+                    <input type="text" id="userFilterInput" placeholder="Qor bisha ama sanadka..." onkeyup="renderApp()">
+                </div>
+                <div id="uProfileHistory"></div>
+                <button class="btn" style="background:var(--success)" onclick="alert('Garaac: *712*771734403*1#')">BIXI $1</button>
+            </div>
+        </div>
+
+        <div id="adminSection" class="section">
+            <div id="adminLoginArea" class="card">
+                <h3>Admin Control</h3>
+                <input type="password" id="adminPassInput" placeholder="Password: admin2026">
+                <button class="btn" style="background:var(--admin)" onclick="adminLogin()">Login Admin</button>
+            </div>
+            <div id="adminDashboard" style="display:none;">
+                <div class="admin-tabs">
+                    <button class="tab-link active-tab" onclick="showTab('t1', this)">Diiwaangeli</button>
+                    <button class="tab-link" onclick="showTab('t2', this)">Xubnaha</button>
+                    <button class="tab-link" onclick="showTab('t3', this)">Transactions</button>
+                    <button class="tab-link" onclick="showTab('t4', this)">Khidmadaha</button>
+                </div>
+
+                <div id="t1" class="tab-content" style="display:block;">
+                    <div class="card">
+                        <b>Xubin Cusub</b>
+                        <input type="text" id="regID" placeholder="ID (Tusaale: 101)">
+                        <input type="text" id="regName" placeholder="Magaca">
+                        <input type="number" id="regPin" placeholder="PIN">
+                        <input type="number" id="regTel" placeholder="WhatsApp">
+                        <button class="btn" style="background:var(--admin)" onclick="saveNewMember()">Keydi Xubinta</button>
+                    </div>
+                </div>
+
+                <div id="t2" class="tab-content" style="display:none;"><div id="adminUserList"></div></div>
+
+                <div id="t3" class="tab-content" style="display:none;">
+                    <div class="search-area">
+                        <b>MASTER SEARCH:</b>
+                        <input type="text" id="adminMasterSearch" placeholder="ID, Magac, ama Taariikh..." onkeyup="renderApp()">
+                    </div>
+                    <div id="fullHistory" class="card"></div>
+                </div>
+
+                <div id="t4" class="tab-content" style="display:none;">
+                    <div class="card">
+                        <b>Ka jar Sanduuqa</b>
+                        <input type="number" id="expAmt" placeholder="Lacagta ($)">
+                        <input type="text" id="expReason" placeholder="Sababta">
+                        <button class="btn" style="background:var(--danger)" onclick="addExpense()">Ka Jar</button>
+                    </div>
+                    <div id="adminExpenseList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref, push, onValue, remove, update, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+  const firebaseConfig = { 
+    apiKey: "AIzaSyBWXMXnFbKXuGek9oFOOk7ZFwIakAKsqbw", 
+    authDomain: "ikgb-2fcf7.firebaseapp.com", 
+    databaseURL: "https://ikgb-2fcf7-default-rtdb.europe-west1.firebasedatabase.app", 
+    projectId: "ikgb-2fcf7" 
+  };
+  
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  let allData = {};
+  let currentLoggedKey = "";
+
+  // UI Navigation
+  window.switchMode = () => {
+    document.getElementById("userSection").classList.toggle("active");
+    document.getElementById("adminSection").classList.toggle("active");
+  };
+
+  window.showTab = (id, btn) => {
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
+    document.querySelectorAll('.tab-link').forEach(b => b.classList.remove('active-tab'));
+    document.getElementById(id).style.display='block';
+    btn.classList.add('active-tab');
+  };
+
+  window.adminLogin = () => {
+    if(document.getElementById("adminPassInput").value === "admin2026") {
+        document.getElementById("adminLoginArea").style.display = "none";
+        document.getElementById("adminDashboard").style.display = "block";
+    } else alert("Password-ka waa khalad!");
+  };
+
+  // Data Fetching
+  onValue(ref(db, 'final_ismail_system'), (snap) => {
+    allData = snap.val() || { members: {}, expenses: {} };
+    renderApp();
+  });
+
+  function renderApp() {
+    const adminUserList = document.getElementById("adminUserList");
+    const adminExpList = document.getElementById("adminExpenseList");
+    const fullHistory = document.getElementById("fullHistory");
+    const masterSearch = document.getElementById("adminMasterSearch").value.toLowerCase();
+
+    adminUserList.innerHTML = ""; adminExpList.innerHTML = ""; fullHistory.innerHTML = "<h4>Transactions</h4>";
+    
+    let totalInc = 0, totalExp = 0;
+
+    if(allData.members) {
+        Object.keys(allData.members).forEach(id => {
+            const m = allData.members[id];
+            let mCount = m.payments ? Object.keys(m.payments).length : 0;
+            totalInc += mCount;
+            
+            adminUserList.innerHTML += `
+                <div class="list-item">
+                    <b>ID: ${id} | ${m.magaca}</b><br><small>PIN: ${m.pin}</small>
+                    <div class="flex-btn">
+                        <button class="small-btn" style="background:var(--success)" onclick="addTick('${id}')">+ Tick</button>
+                        <button class="small-btn" style="background:var(--user)" onclick="editMember('${id}')">Edit</button>
+                        <button class="small-btn" style="background:var(--danger)" onclick="deleteMember('${id}')">Tirtir</button>
+                    </div>
+                </div>`;
+            
+            if(m.payments) {
+                Object.keys(m.payments).forEach(pKey => {
+                    const p = m.payments[pKey];
+                    const content = `${id} ${m.magaca} ${p.waqtiga}`.toLowerCase();
+                    if(content.includes(masterSearch)) {
+                        fullHistory.innerHTML += `<div class="history-item"><span>✅ [${id}] ${m.magaca} - ${p.waqtiga}</span><button onclick="deletePayment('${id}','${pKey}')" style="color:red;border:none;background:none;cursor:pointer;">[X]</button></div>`;
+                    }
+                });
+            }
+        });
+    }
+
+    if(allData.expenses) {
+        Object.keys(allData.expenses).forEach(key => {
+            const e = allData.expenses[key];
+            totalExp += parseFloat(e.amount);
+            if(`${e.reason} ${e.waqtiga}`.toLowerCase().includes(masterSearch)) {
+                adminExpList.innerHTML += `<div class="list-item" style="border-left-color:red"><b>$${e.amount} - ${e.reason}</b><button class="small-btn" style="background:red;margin-top:5px;" onclick="deleteExpense('${key}')">Tirtir</button></div>`;
+                fullHistory.innerHTML += `<div class="history-item" style="color:red"><span>❌ Kharash: $${e.amount} - ${e.reason}</span></div>`;
+            }
+        });
+    }
+    if(currentLoggedKey) renderUserProfile(totalInc - totalExp);
+  }
+
+  // --- ADMIN ACTIONS ---
+  window.saveNewMember = () => {
+    const id = document.getElementById("regID").value.trim();
+    const n = document.getElementById("regName").value, p = document.getElementById("regPin").value, t = document.getElementById("regTel").value;
+    if(id && n && p && t) {
+        set(ref(db, 'final_ismail_system/members/' + id), { magaca: n, pin: p, tel: t });
+        alert("Xubinta waa la keydiyay!");
+        document.getElementById("regID").value = ""; document.getElementById("regName").value = "";
+    } else alert("Fadlan buuxi meelaha bannaan!");
+  };
+
+  window.editMember = (oldID) => {
+    const m = allData.members[oldID];
+    const newName = prompt("Bedel Magaca:", m.magaca);
+    const newPin = prompt("Bedel PIN-ka:", m.pin);
+    const newTel = prompt("Bedel Tel-ka:", m.tel);
+    if(newName && newPin && newTel) {
+        update(ref(db, `final_ismail_system/members/${oldID}`), { magaca: newName, pin: newPin, tel: newTel });
+    }
+  };
+
+  window.addTick = (id) => {
+    const t = new Date().toLocaleString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    push(ref(db, `final_ismail_system/members/${id}/payments`), { waqtiga: t });
+  };
+
+  window.addExpense = () => {
+    const a = document.getElementById("expAmt").value, r = document.getElementById("expReason").value;
+    const t = new Date().toLocaleString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    if(a && r) {
+        push(ref(db, 'final_ismail_system/expenses'), { amount: a, reason: r, waqtiga: t });
+        document.getElementById("expAmt").value = ""; document.getElementById("expReason").value = "";
+    }
+  };
+
+  window.deletePayment = (mID, pID) => { if(confirm("Ma tirtirtaa lacagtan?")) remove(ref(db, `final_ismail_system/members/${mID}/payments/${pID}`)); };
+  window.deleteMember = (id) => { if(confirm("Ma tirtirtaa xubintan?")) remove(ref(db, 'final_ismail_system/members/' + id)); };
+  window.deleteExpense = (key) => { if(confirm("Ma tirtirtaa kharashkan?")) remove(ref(db, 'final_ismail_system/expenses/' + key)); };
+
+  // --- USER ACTIONS ---
+  window.userLogin = () => {
+    const id = document.getElementById("userIDInput").value.trim();
+    const pin = document.getElementById("userPinInput").value.trim();
+    if(allData.members && allData.members[id] && allData.members[id].pin == pin) {
+        currentLoggedKey = id;
+        document.getElementById("userLoginForm").style.display = "none";
+        document.getElementById("userProfileView").style.display = "block";
+        renderApp();
+    } else alert("ID ama PIN waa khalad!");
+  };
+
+  function renderUserProfile(overall) {
+    const u = allData.members[currentLoggedKey];
+    if(!u) return;
+    const uSearch = document.getElementById("userFilterInput").value.toLowerCase();
+    let count = 0; let h = "";
+    if(u.payments) {
+        Object.values(u.payments).reverse().forEach(p => {
+            if(p.waqtiga.toLowerCase().includes(uSearch)) {
+                count++;
+                h += `<div class="history-item">✅ $1 - ${p.waqtiga}</div>`;
+            }
+        });
+    }
+    document.getElementById("uProfileName").innerText = u.magaca;
+    document.getElementById("uProfileBalances").innerHTML = `
+        <div style="background:#e8f0fe; padding:10px; border-radius:8px; margin-bottom:5px;"><small>Haraaga Sanduuqa:</small> <b>$${overall || 0}</b></div>
+        <div style="background:#e6f4ea; padding:10px; border-radius:8px;"><small>Lacagtaada (Filter):</small> <b>$${count}</b></div>`;
+    document.getElementById("uProfileHistory").innerHTML = "<b>Xogtaada:</b>" + (h || "<div>Lama helin wax xog ah.</div>");
+  }
+
+  window.logoutUser = () => {
+    currentLoggedKey = "";
+    document.getElementById("userProfileView").style.display = "none";
+    document.getElementById("userLoginForm").style.display = "block";
+  };
+</script>
+</body>
+</html>
